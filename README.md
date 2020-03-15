@@ -1,52 +1,78 @@
 # proectmario
 
 import pygame
-
-W = 1600
-H = 1000 
-WHITE = (255, 255, 255)
-GREEN = (0, 255, 25)
+pygame.init()
+win = pygame.display.set_mode((500, 500))
+pygame.display.set_caption("Cubes Game")
+walkLeft = [pygame.image.load('pygame_left_1.png'),
+pygame.image.load('pygame_left_2.png'), pygame.image.load('pygame_left_3.png'),
+pygame.image.load('pygame_left_4.png'), pygame.image.load('pygame_left_5.png'), pygame.image.load('pygame_left_6.png')]
+walkRight = [pygame.image.load('pygame_right_1.png'),
+pygame.image.load('pygame_right_2.png'), pygame.image.load('pygame_right_3.png'),
+pygame.image.load('pygame_right_4.png'), pygame.image.load('pygame_right_5.png'), pygame.image.load('pygame_right_6.png')]
+bg = pygame.image.load('pygame_bg.jpg')
+playerStand = pygame.image.load('pygame_idle.png')
+clock = pygame.time.Clock()
+x = 50
+y = 425
+wight = 60
+height = 71
+speed = 5
 isJump = False
 jumpCount = 10
- 
-pygame.init()
-sc = pygame.display.set_mode((W, H))
- 
-# координаты и радиус круга
-x = 100
-y = 700
+left = False
+right = False
+animCount = 0
 
-
-while 1:
-    sc.fill(WHITE)
-    pygame.draw.rect(sc, GREEN, (x, y, 40, 60))
- 
+def drawWindow():
+    global animCount
+    win.blit(bg, (0, 0))
+    if animCount + 1 >= 30:
+        animCount = 0
+    if left:
+        win.blit(walkLeft[animCount // 5], (x, y))
+        animCount += 1
+    elif right:
+        win.blit(walkRight[animCount // 5], (x, y))
+        animCount += 1
+    else:
+        win.blit(playerStand, (x, y))
     pygame.display.update()
- 
-    for i in pygame.event.get():
-        if i.type == pygame.QUIT:
-            exit()
-        elif i.type == pygame.KEYDOWN:
+run = True
 
-            if i.key == pygame.K_a and x > 60:
-                x -= 30
+while run:
+    clock.tick(30)
+    for event in pygame.event.get():
+        if event.type == pygame.QUIT:
+            run = False
 
-            if i.key == pygame.K_d and x < 1540:
-                x += 30
-            
-            while jumpCount != 0:
-            
-            if i.key == pygame.K_SPACE and y > 60:
-                isJump = True
-            
-                if jumpCount >= -10:
-                    if jumpCount < 0:
-                        y += (jumpCount**2) / 2
-                    else:
-                        y -= (jumpCount**2) / 2
-                    jumpCount -= 1
-                    pygame.display.update
-                else:
-                        isJump = False
-                        jumpCount = 10
-        pygame.display.update
+    keys = pygame.key.get_pressed()
+    if keys[pygame.K_LEFT] and x > 5:
+        x -= speed
+        left = True
+        right = False
+        lastMove = "left"
+    elif keys[pygame.K_RIGHT] and x < 500 - wight - 5:
+        x += speed
+        right = True
+        left = False
+        lastMove = "right"
+    else:
+        left = False
+        right = False
+        animCount = 0
+    if not(isJump):
+        if keys[pygame.K_UP]:
+            isJump = True
+    else:
+        if jumpCount >= -10:
+            if jumpCount < 0:
+                y += (jumpCount ** 2) / 2
+            else:
+                y -= (jumpCount ** 2) / 2
+            jumpCount -= 1
+        else:
+            isJump = False
+            jumpCount = 10
+    drawWindow()
+pygame.quit()
